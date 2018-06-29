@@ -23,7 +23,7 @@ microcode       : 0x74
 cpu MHz         : 1758.593
 cache size      : 8192 KB
 physical id     : 0
-$ docker build -t count-dnn-flops .
+$ docker build --build-arg KERNEL_VERSION=$(uname -r) -t count-dnn-flops .
 $ docker run --cap-add SYS_ADMIN -v $PWD:/work -w /work count-dnn-flops python eval_imagenet.py --count-by functions googlenet
 "Convolution2DFunction","30507008"
 "ReLU","0"
