@@ -9,7 +9,7 @@ ARG CHAINER_VERSION=4.2.0
 ARG IDEEP_VERSION=1.0.4
 RUN pip3 --no-cache-dir install ideep4py==${IDEEP_VERSION} cupy==${CHAINER_VERSION} chainer==${CHAINER_VERSION} Pillow
 RUN apt-get update -y\
- && apt-get install -y --no-install-recommends linux-tools-generic git swig gawk python3-cffi\
+ && apt-get install -y --no-install-recommends linux-tools-generic git swig gawk\
  && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 3\
  && mkdir -p /opt/src\
