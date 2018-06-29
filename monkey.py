@@ -15,12 +15,14 @@ def count_decorator(f, counter_cls):
         return y
     return _inner
 
+
 def decorate_link(link, counter_cls):
     for child in link._children:
         if hasattr(child, 'children'):
             decorate_link(child, counter_cls)
         child_link = getattr(link, child)
         setattr(link, child, count_decorator(child_link, counter_cls))
+
 
 def override_fn(counter_cls):
     chainer.function_node.FunctionNode.apply = (
@@ -35,6 +37,7 @@ def ignore_decorator(f):
             y = f(*args, **kwargs)
         return y
     return _inner
+
 
 def override_bn():
     chainer.functions.normalization.batch_normalization._x_hat = (

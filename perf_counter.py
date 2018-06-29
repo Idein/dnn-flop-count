@@ -2,7 +2,6 @@ import os
 import struct
 
 import perfmon
-from perfmon import PerThreadSession
 
 THREAD_ENVS = [
     'OMP_NUM_THREADS',
@@ -10,6 +9,7 @@ THREAD_ENVS = [
     'OPENBLAS_NUM_THREADS',
     'MKL_NUM_THREADS',
 ]
+
 
 class Counter(object):
     def __init__(self):
@@ -19,13 +19,13 @@ class Counter(object):
             'FP_ARITH:256B_PACKED_SINGLE',
             'FP_ARITH:512B_PACKED_SINGLE',
         ]
-        self.packed = [1, 4, 8, 16] # to convert single precision float, 32bit, ops
+        self.packed = [1, 4, 8, 16]  # to convert 32bit float ops
         self.exit = False
         self.old_env = {}
 
     def __enter__(self):
         # use PerThreadSession and force single thread
-        self.session = PerThreadSession(os.getpid(), self.events)
+        self.session = perfmon.PerThreadSession(os.getpid(), self.events)
         self.session.start()
         for env in THREAD_ENVS:
             self.old_env[env] = os.environ.get(env, None)
