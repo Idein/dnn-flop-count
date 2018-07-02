@@ -1,4 +1,5 @@
 import argparse
+import warnings
 
 import numpy as np
 
@@ -43,17 +44,24 @@ def main():
         if chainer.config.use_ideep != "never":
             model.to_intel64()
 
-    if args.count_by == 'layers' and args.gpu < 0:
+    if args.count_by is not None and args.gpu > 0:
+        warnings.warn("count_by with GPU is not supported", ValueError)
+
+    if args.count_by == 'layers':
         from perf_counter import Counter
         monkey.decorate_link(model, Counter)
-    elif args.count_by == 'functions' and args.gpu < 0:
-        from perf_counter import Counter
-        monkey.override_fn(Counter)
+    if args.count_by == 'functions':
+        from perf_counter import CounterHook
+    else:
+        from monkey import CounterHook
 
     image = np.zeros((1, 3, 224, 224), dtype=np.float32)  # dummy image
     with chainer.using_config('train', False):
         with chainer.using_config('enable_backprop', False):
-            model.predict(image, oversample=False)
+            with CounterHook() as counter:
+                model.predict(image, oversample=False)
+    for fn, float_ops in counter.call_history:
+        print('"{}","{}"'.format(fn, float_ops))
 
 
 if __name__ == '__main__':
